@@ -13,6 +13,7 @@ public abstract class User {
         this.email = email;
         this.role = role;
     }
+    public User() {}
     
     public String getName() { return name; }
     public String getID() { return id; }
