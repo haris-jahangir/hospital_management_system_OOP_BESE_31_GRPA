@@ -8,9 +8,9 @@ public class Patient extends User {
     private String bloodGroup;
     private ArrayList<String> medicalHistory;
 
-    public Patient(String userID, String name, String email, String patientRecordID, String bloodGroup) 
+    public Patient(String id, String name, String email, String patientRecordID, String bloodGroup) 
     {
-        super(userID, name, email, "PATIENT");
+        super(id, name, email, "PATIENT");
         this.patientRecordID = patientRecordID;
         this.bloodGroup = bloodGroup;
         this.medicalHistory = new ArrayList<>();
