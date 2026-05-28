@@ -22,8 +22,11 @@ public class Patient extends User {
 
     public void setPatientRecordID(String patientRecordID) { this.patientRecordID = patientRecordID; }
     public void setBloodGroup(String bloodGroup) { this.bloodGroup = bloodGroup; }
-    public void addHistoryEntry(String entry) {
-        if (entry != null && !entry.trim().isEmpty()) {
+    
+    public void addHistoryEntry(String entry) 
+    {
+        if (entry != null && !entry.trim().isEmpty()) 
+        {
             this.medicalHistory.add(entry);
         }
     }
@@ -41,10 +44,14 @@ public class Patient extends User {
         System.out.println("Blood Group: " + bloodGroup);
         System.out.println("Medical History Log:");
 
-        if (medicalHistory.isEmpty()) {
+        if (medicalHistory.isEmpty())     
+        {
             System.out.println(" - No history recorded yet.");
-        } else {
-            for (String record : medicalHistory) {
+        } 
+        else 
+        {
+            for (String record : medicalHistory) 
+            {
                 System.out.println(" - " + record);
             }
         }
