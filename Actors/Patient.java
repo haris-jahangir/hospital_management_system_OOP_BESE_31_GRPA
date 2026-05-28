@@ -8,9 +8,10 @@ public class Patient extends User {
     private String bloodGroup;
     private ArrayList<String> medicalHistory;
 
-    public Patient(String id, String name, String email, String patientRecordID, String bloodGroup) 
+    public Patient(String name, String id, String email, String patientRecordID, String bloodGroup) 
     {
-        super(id, name, email, "PATIENT");
+      
+        super(name, id, email, "PATIENT");
         this.patientRecordID = patientRecordID;
         this.bloodGroup = bloodGroup;
         this.medicalHistory = new ArrayList<>();
@@ -31,20 +32,19 @@ public class Patient extends User {
         }
     }
 
-    
-
     @Override
     public void displayProfile() 
     {
         System.out.println("___ PATIENT PROFILE ___");
-        System.out.println("User ID: " + getUserID());
+        
+        System.out.println("User ID: " + getID());
         System.out.println("Name: " + getName());
         System.out.println("Email: " + getEmail());
         System.out.println("Patient Record ID: " + patientRecordID);
         System.out.println("Blood Group: " + bloodGroup);
         System.out.println("Medical History Log:");
 
-        if (medicalHistory.isEmpty())     
+        if (medicalHistory.isEmpty())    
         {
             System.out.println(" - No history recorded yet.");
         } 

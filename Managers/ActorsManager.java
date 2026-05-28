@@ -1,6 +1,5 @@
 package Managers;
 
-// Import the files from the Actors package so this script can see them
 import Actors.User;
 import Actors.Patient;
 import Actors.Doctor;
