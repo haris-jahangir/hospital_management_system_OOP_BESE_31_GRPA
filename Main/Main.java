@@ -1,120 +1,214 @@
 package Main;
 
-import Actors.Patient;
-import Actors.Doctor;
-import Actors.Admin;
-import Managers.ActorsManager;
+import Actors.*;
+import Appointments.*;
+import Managers.*;
 import Services.*;
-import Appointments.AppointmentManager;
+import billing.*;
+import reporting.*;
+import java.util.ArrayList;
 
 public class Main {
     public static void main(String[] args) {
 
-        ActorsManager actorsManager = new ActorsManager();
+        System.out.println("\n============================================");
+        System.out.println("   HOSPITAL MANAGEMENT SYSTEM - OOP PBL   ");
+        System.out.println("============================================\n");
 
-        Patient p1 = new Patient("Ali Khan", "P001", "ali@email.com", "REC001", "B+");
-        Patient p2 = new Patient("Sara Malik", "P002", "sara@email.com", "REC002", "O+");
-        Doctor d1 = new Doctor("Dr. Ahmed", "D001", "ahmed@email.com", "Cardiology");
-        Doctor d2 = new Doctor("Dr. Ayesha", "D002", "ayesha@email.com", "Neurology");
+        // ══════════════════════════════════════════
+        // 1. SETUP - Create Managers
+        // ══════════════════════════════════════════
+        ActorsManager actorsManager    = new ActorsManager();
+        AppointmentManager apptManager = new AppointmentManager(actorsManager);
+        ServiceRecordManager svcRecMgr = ServiceRecordManager.getInstance();
+        BillingManager billingManager  = new BillingManager();
+
+        // ══════════════════════════════════════════
+        // 2. USER REGISTRATION
+        // ══════════════════════════════════════════
+        System.out.println("============================================");
+        System.out.println("         STEP 1: USER REGISTRATION         ");
+        System.out.println("============================================");
+
+        Patient p1 = new Patient("Ali Khan",   "P001", "ali@email.com",  "REC-001", "B+");
+        Patient p2 = new Patient("Sara Ahmed", "P002", "sara@email.com", "REC-002", "A+");
+
+        Doctor d1 = new Doctor("Dr. Salman",  "D001", "salman@email.com", "Cardiology");
+        Doctor d2 = new Doctor("Dr. Ayesha",  "D002", "ayesha@email.com", "Orthopedics");
+
+        Admin a1 = new Admin("Usman Ali", "A001", "usman@email.com", "Administration");
 
         actorsManager.addUser(p1);
         actorsManager.addUser(p2);
         actorsManager.addUser(d1);
         actorsManager.addUser(d2);
+        actorsManager.addUser(a1);
 
-        AppointmentManager apptManager = new AppointmentManager(actorsManager);
+        p1.displayProfile();
+        d1.displayProfile();
+        a1.displayProfile();
 
-        apptManager.scheduleAppointment("APT001", "P001", "D001", "2025-06-10", "10:00 AM");
-        apptManager.scheduleAppointment("APT002", "P002", "D002", "2025-06-11", "02:00 PM");
-        apptManager.scheduleEmergency("APT003", "P001", "D002", "2025-06-10", "IMMEDIATE");
-        apptManager.rescheduleAppointment("APT001", "2025-06-15", "11:00 AM");
+        // ══════════════════════════════════════════
+        // 3. APPOINTMENT SCHEDULING
+        // ══════════════════════════════════════════
+        System.out.println("============================================");
+        System.out.println("      STEP 2: APPOINTMENT SCHEDULING       ");
+        System.out.println("============================================");
+
+        apptManager.scheduleAppointment("APT001", "P001", "D001", "02-06-2026", "09:00 AM");
+        apptManager.scheduleAppointment("APT002", "P002", "D002", "02-06-2026", "10:00 AM");
+        apptManager.scheduleEmergency("APT003", "P001", "D001", "02-06-2026", "08:00 AM");
+        apptManager.rescheduleAppointment("APT002", "03-06-2026", "11:00 AM");
         apptManager.cancelAppointment("APT002");
+        apptManager.completeAppointment("APT001");
         apptManager.completeAppointment("APT003");
         apptManager.displayAllAppointments();
-        // ========== PERSON 3: SERVICES & DIAGNOSTICS DEMO ==========
-        System.out.println("\n========== SERVICES & DIAGNOSTICS MODULE ==========\n");
 
-        // Get the actual Patient and Doctor objects
-        Patient ali = (Patient) actorsManager.findUserByID("P001");
-        Patient sara = (Patient) actorsManager.findUserByID("P002");
-        Doctor ahmed = (Doctor) actorsManager.findUserByID("D001");
-        Doctor ayesha = (Doctor) actorsManager.findUserByID("D002");
+        // ══════════════════════════════════════════
+        // 4. SERVICES EXECUTION
+        // ══════════════════════════════════════════
+        System.out.println("============================================");
+        System.out.println("        STEP 3: SERVICES EXECUTION         ");
+        System.out.println("============================================");
 
-        // Get the service record manager
-        ServiceRecordManager recordManager = ServiceRecordManager.getInstance();
+        // Patient 1 - Consultation
+        ConsultationService cons1 = new ConsultationService("SVC001", p1, d1, false);
+        cons1.setSymptoms("Chest pain and shortness of breath");
+        cons1.setDiagnosis("Possible heart condition");
+        cons1.setPrescription("ECG and blood tests recommended");
+        cons1.execute();
+        svcRecMgr.addServiceToPatient(p1, cons1);
 
-        System.out.println("--- Creating Consultation Services ---");
-        // Consultation for Ali with Dr. Ahmed
-        ConsultationService cs1 = new ConsultationService("S001", ali, ahmed, false);
-        cs1.setSymptoms("Chest pain, shortness of breath, fatigue");
-        cs1.setDiagnosis("Hypertension with possible cardiac involvement");
-        cs1.setPrescription("Lisinopril 10mg daily, follow up in 2 weeks");
-        cs1.execute();
-        recordManager.addServiceToPatient(ali, cs1);
-
-        // Consultation for Sara with Dr. Ayesha
-        ConsultationService cs2 = new ConsultationService("S002", sara, ayesha, false);
-        cs2.setSymptoms("Severe headache, blurred vision");
-        cs2.setDiagnosis("Migraine with aura");
-        cs2.setPrescription("Sumatriptan 50mg as needed, avoid triggers");
-        cs2.execute();
-        recordManager.addServiceToPatient(sara, cs2);
-
-        System.out.println("\n--- Creating Lab Tests ---");
-        // Lab test for Ali
-        LabTestService lab1 = new LabTestService("L001", ali, ahmed, "Blood Test");
-        lab1.setTechnician("Tech. Rahman");
-        lab1.setResult("BP: 145/95, Cholesterol: 220, HDL: 35", true);
+        // Patient 1 - Lab Test
+        LabTestService lab1 = new LabTestService("SVC002", p1, d1, "ECG");
+        lab1.setTechnician("Tech. Bilal");
+        lab1.setResult("Mild arrhythmia detected", true);
         lab1.execute();
-        recordManager.addServiceToPatient(ali, lab1);
+        svcRecMgr.addServiceToPatient(p1, lab1);
 
-        // Lab test for Sara
-        LabTestService lab2 = new LabTestService("L002", sara, ayesha, "MRI");
-        lab2.setTechnician("Tech. Fatima");
-        lab2.setResult("Normal brain scan, no abnormalities detected", false);
+        // Patient 1 - Blood Test
+        LabTestService lab2 = new LabTestService("SVC003", p1, d1, "Blood Test");
+        lab2.setTechnician("Tech. Bilal");
+        lab2.setResult("Normal blood count", false);
         lab2.execute();
-        recordManager.addServiceToPatient(sara, lab2);
+        svcRecMgr.addServiceToPatient(p1, lab2);
 
-        System.out.println("\n--- Creating Treatments ---");
-        // Treatment for Ali
-        TreatmentService tx1 = new TreatmentService("T001", ali, ahmed, "Medication");
-        tx1.execute();
-        tx1.completeSession();
-        tx1.setOutcome("Patient responding well to medication");
-        recordManager.addServiceToPatient(ali, tx1);
+        // Patient 1 - Treatment
+        TreatmentService treat1 = new TreatmentService("SVC004", p1, d1, "Medication", 3);
+        treat1.execute();
+        treat1.completeSession();
+        treat1.completeSession();
+        treat1.setOutcome("Patient responding well to medication");
+        svcRecMgr.addServiceToPatient(p1, treat1);
 
-        // Follow-up consultation for Ali (discounted rate)
-        ConsultationService cs3 = new ConsultationService("S003", ali, ahmed, true);
-        cs3.setSymptoms("Feeling better, occasional chest discomfort");
-        cs3.setDiagnosis("Improving, continue medication");
-        cs3.setPrescription("Continue Lisinopril, add baby aspirin");
-        cs3.execute();
-        recordManager.addServiceToPatient(ali, cs3);
+        // Patient 2 - Consultation
+        ConsultationService cons2 = new ConsultationService("SVC005", p2, d2, false);
+        cons2.setSymptoms("Knee pain after fall");
+        cons2.setDiagnosis("Fracture in left knee");
+        cons2.setPrescription("X-Ray and physiotherapy required");
+        cons2.execute();
+        svcRecMgr.addServiceToPatient(p2, cons2);
 
-        System.out.println("\n--- Running Diagnostic Engine ---");
-        // Use diagnostic engine to recommend tests/treatments
-        DiagnosticsEngine.runDiagnosticWorkflow(cs1, recordManager.getServiceRecord(ali), "REC");
+        // Patient 2 - X-Ray
+        LabTestService lab3 = new LabTestService("SVC006", p2, d2, "X-Ray");
+        lab3.setTechnician("Tech. Zara");
+        lab3.setResult("Hairline fracture confirmed", true);
+        lab3.execute();
+        svcRecMgr.addServiceToPatient(p2, lab3);
 
-        System.out.println("\n--- Displaying Service Records ---");
-        // Display complete service record for Ali
-        recordManager.displayPatientRecord(ali);
+        // Patient 2 - Physiotherapy
+        TreatmentService treat2 = new TreatmentService("SVC007", p2, d2, "Physiotherapy", 3);
+        treat2.execute();
+        treat2.completeSession();
+        treat2.completeSession();
+        treat2.setOutcome("Physiotherapy ongoing");
+        svcRecMgr.addServiceToPatient(p2, treat2);
 
-        // Display simple record for Sara
-        System.out.println("\n--- Sara's Service Summary ---");
-        recordManager.getServiceRecord(sara).displaySimple();
+        // Display service records
+        svcRecMgr.displayPatientRecord(p1);
+        svcRecMgr.displayPatientRecord(p2);
 
-        System.out.println("\n--- FOR PERSON 4 (BILLING) ---");
-        System.out.println("This data is ready for invoice generation:\n");
+        // ══════════════════════════════════════════
+        // 5. DIAGNOSTICS ENGINE
+        // ══════════════════════════════════════════
+        System.out.println("============================================");
+        System.out.println("        STEP 4: DIAGNOSTICS ENGINE         ");
+        System.out.println("============================================");
 
-        ServiceRecord aliRecord = recordManager.getServiceRecord(ali);
-        System.out.println("Patient: " + ali.getName() + " (" + ali.getID() + ")");
-        System.out.println("Completed Billable Services:");
-        for (Service s : aliRecord.getCompletedServices()) {
-            System.out.println("  • " + s.getServiceType() + " (ID: " + s.getServiceID() + "): $" + s.getCost());
-        }
-        System.out.println("  ---------------------------------");
-        System.out.println("  TOTAL AMOUNT DUE: $" + aliRecord.calculateTotalCost());
+        DiagnosticsEngine.runDiagnosticWorkflow(cons1, null, "SVC");
+        DiagnosticsEngine.runDiagnosticWorkflow(cons2, null, "SVC");
 
-        System.out.println("\n========== END OF SERVICES DEMO ==========");
+        // ══════════════════════════════════════════
+        // 6. BILLING
+        // ══════════════════════════════════════════
+        System.out.println("============================================");
+        System.out.println("          STEP 5: BILLING MODULE           ");
+        System.out.println("============================================");
+
+        ServiceRecord rec1 = svcRecMgr.getServiceRecord(p1);
+        ServiceRecord rec2 = svcRecMgr.getServiceRecord(p2);
+
+        // Standard invoice for P001 - gets 10% discount if total > 500
+        StandardInvoice inv1 = billingManager.createStandardInvoice(p1, rec1);
+        inv1.printInvoice();
+
+        // Emergency invoice for P001 - no discount
+        EmergencyInvoice inv2 = billingManager.createEmergencyInvoice(p1, rec1);
+        inv2.printInvoice();
+
+        // Standard invoice for P002
+        StandardInvoice inv3 = billingManager.createStandardInvoice(p2, rec2);
+        inv3.printInvoice();
+
+        // Pay invoice
+        billingManager.payInvoice(inv1.getInvoiceID());
+
+        // ══════════════════════════════════════════
+        // 7. ACCESS CONTROL
+        // ══════════════════════════════════════════
+        System.out.println("============================================");
+        System.out.println("        STEP 6: ACCESS CONTROL             ");
+        System.out.println("============================================");
+
+        System.out.println("Is P001 a PATIENT? " + p1.isAuthorized("PATIENT"));
+        System.out.println("Is D001 a DOCTOR?  " + d1.isAuthorized("DOCTOR"));
+        System.out.println("Is A001 an ADMIN?  " + a1.isAuthorized("ADMIN"));
+        System.out.println("Is P001 a DOCTOR?  " + p1.isAuthorized("DOCTOR"));
+
+        actorsManager.checkAccess("P001", "PATIENT");
+        actorsManager.checkAccess("D001", "ADMIN");
+
+        // ══════════════════════════════════════════
+        // 8. REPORTS
+        // ══════════════════════════════════════════
+        System.out.println("============================================");
+        System.out.println("         STEP 7: REPORTS MODULE            ");
+        System.out.println("============================================");
+
+        // Patient Report P001
+        ArrayList<Invoice> p1Invoices = billingManager.getInvoicesByPatient("P001");
+        PatientReport patReport1 = new PatientReport(p1, rec1, p1Invoices);
+        patReport1.generateReport();
+
+        // Patient Report P002
+        ArrayList<Invoice> p2Invoices = billingManager.getInvoicesByPatient("P002");
+        PatientReport patReport2 = new PatientReport(p2, rec2, p2Invoices);
+        patReport2.generateReport();
+
+        // Billing Report P001
+        BillingReport billReport = new BillingReport("P001", p1.getName(), billingManager);
+        billReport.generateReport();
+
+        // Service Report P001
+        ServiceReport svcReport1 = new ServiceReport(rec1);
+        svcReport1.generateReport();
+
+        // Service Report P002
+        ServiceReport svcReport2 = new ServiceReport(rec2);
+        svcReport2.generateReport();
+
+        System.out.println("\n============================================");
+        System.out.println("          SYSTEM DEMO COMPLETE             ");
+        System.out.println("============================================\n");
     }
 }
