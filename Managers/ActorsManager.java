@@ -1,9 +1,9 @@
 package Managers;
 
 import Actors.User;
-import Actors.Patient;
+
 import Actors.Doctor;
-import Actors.Admin;
+
 import Actors.ADS;
 import java.util.ArrayList;
 

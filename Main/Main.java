@@ -135,8 +135,8 @@ public class Main {
         System.out.println("        STEP 4: DIAGNOSTICS ENGINE         ");
         System.out.println("============================================");
 
-        DiagnosticsEngine.runDiagnosticWorkflow(cons1, null, "SVC");
-        DiagnosticsEngine.runDiagnosticWorkflow(cons2, null, "SVC");
+        DiagnosticsEngine.runDiagnosticWorkflow(cons1);
+        DiagnosticsEngine.runDiagnosticWorkflow(cons2);
 
         // ══════════════════════════════════════════
         // 6. BILLING

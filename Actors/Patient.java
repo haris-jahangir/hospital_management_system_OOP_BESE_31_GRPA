@@ -1,7 +1,6 @@
 package Actors;
 
 import java.util.ArrayList;
-import Services.ServiceRecord;
 
 public class Patient extends User {
 

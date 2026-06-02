@@ -1,7 +1,4 @@
 package Services;
-
-import Actors.Patient;
-import Actors.Doctor;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -66,9 +63,7 @@ public class DiagnosticsEngine {
         return treatments;
     }
 
-    public static void runDiagnosticWorkflow(ConsultationService consultation,
-            ServiceRecord record,
-            String serviceIdPrefix) {
+    public static void runDiagnosticWorkflow(ConsultationService consultation) {
         String diagnosis = consultation.getDiagnosis();
         if (diagnosis == null || diagnosis.isEmpty()) {
             System.out.println("[DIAGNOSTICS] No diagnosis provided. Cannot recommend tests.");
@@ -81,7 +76,7 @@ public class DiagnosticsEngine {
         ArrayList<String> tests = recommendTests(diagnosis);
         if (!tests.isEmpty()) {
             System.out.println("[DIAGNOSTICS] Recommended Lab Tests: " + tests);
-            // Note: In real implementation, would auto-create LabTestService objects
+            
         }
 
         // Recommend treatments

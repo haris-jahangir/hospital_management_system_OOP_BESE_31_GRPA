@@ -65,22 +65,51 @@ public class AppointmentManager {
         return true;
     }
 
+
+   // ── Find appointment by ID ────────────────────────────────────────────────
+    public Appointment findAppointmentByID(String appointmentID) {
+        if (appointmentID == null) return null;
+
+        for (int i = 0; i < appointmentList.size(); i++) {
+            if (appointmentList.get(i).getAppointmentID().equalsIgnoreCase(appointmentID)) {
+                return appointmentList.get(i);
+            }
+        }
+        return null;
+    }
+
+
     // ── Schedule an EMERGENCY appointment (bypasses availability check) ────────
     public boolean scheduleEmergency(String appointmentID, String patientID,
                                      String doctorID, String date, String timeSlot) {
 
+        // Check patient exists
         User patient = actorsManager.findUserByID(patientID);
         if (patient == null) {
             System.out.println("[ERROR] Patient ID not found: " + patientID);
             return false;
         }
 
+        // Check doctor exists
         User doctorUser = actorsManager.findUserByID(doctorID);
         if (doctorUser == null) {
             System.out.println("[ERROR] Doctor ID not found: " + doctorID);
             return false;
         }
+        
+        // Check patient role
+        if (!patient.getRole().equalsIgnoreCase("PATIENT")) {
+            System.out.println("[ERROR] ID does not belong to a patient: " + patientID);
+            return false;
+        }
 
+        // Check doctor role
+        if (!doctorUser.getRole().equalsIgnoreCase("DOCTOR")) {
+            System.out.println("[ERROR] ID does not belong to a doctor: " + doctorID);
+            return false;
+        }
+
+        // Check duplicate appointment ID
         if (findAppointmentByID(appointmentID) != null) {
             System.out.println("[ERROR] Appointment ID already exists: " + appointmentID);
             return false;
@@ -170,17 +199,6 @@ public class AppointmentManager {
         return true;
     }
 
-    // ── Find appointment by ID ────────────────────────────────────────────────
-    public Appointment findAppointmentByID(String appointmentID) {
-        if (appointmentID == null) return null;
-
-        for (int i = 0; i < appointmentList.size(); i++) {
-            if (appointmentList.get(i).getAppointmentID().equalsIgnoreCase(appointmentID)) {
-                return appointmentList.get(i);
-            }
-        }
-        return null;
-    }
 
     // ── Get all appointments for a specific patient ───────────────────────────
     public ArrayList<Appointment> getAppointmentsByPatient(String patientID) {
